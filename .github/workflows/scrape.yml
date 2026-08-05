@@ -1,0 +1,48 @@
+name: Praktikum-Radar
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Abhaengigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Scraper ausfuehren
+        env:
+          ADZUNA_APP_ID:  ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
+        run: python -m src.scrape
+
+      - name: Ergebnisse committen
+        run: |
+          git config user.name  "praktikum-radar"
+          git config user.email "actions@github.com"
+          git add data/jobs.db docs/index.html docs/praktika.xlsx config/companies.yaml
+          if git diff --staged --quiet; then
+            echo "Keine Aenderungen."
+          else
+            git commit -m "Lauf $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
