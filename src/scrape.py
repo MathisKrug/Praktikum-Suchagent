@@ -23,6 +23,7 @@ from .score import Scorer
 from .store import Store
 from .render import render_html, render_xlsx
 from .discovery import run_discovery
+from .enrich import enrich
 from . import employers as emp
 from .detect import detect
 
@@ -76,6 +77,7 @@ def main() -> int:
     # ---------------- Feste Firmenliste ----------------
 
     log.info("=== Feste Firmenliste ===")
+    broken: list[dict] = []
     for company in companies_cfg["companies"]:
         name = company["name"]
         try:
@@ -85,7 +87,11 @@ def main() -> int:
             msg = f"{name}: {type(e).__name__}: {str(e)[:180]}"
             errors.append(msg)
             log.warning("  %s", msg)
+            broken.append(company)
             continue
+
+        if not jobs and company.get("status") != "auto":
+            broken.append(company)
 
         raw_total += len(jobs)
         kept = []
@@ -95,6 +101,45 @@ def main() -> int:
                 kept.append(j)
         relevant.extend(kept)
         log.info("%-28s %3d roh -> %2d relevant", name[:28], len(jobs), len(kept))
+
+    # ---------------- Selbstreparatur ----------------
+    # Adapter, die gar nichts liefern, werden derselben automatischen
+    # Systemerkennung unterworfen, die bei den entdeckten Firmen funktioniert.
+    # Das ist verlaesslicher als von Hand geratene Konfiguration.
+
+    if broken:
+        log.info("=== Selbstreparatur: %d Adapter ohne Ergebnis ===", len(broken))
+        repaired = 0
+        for company in broken:
+            found = detect(company["name"])
+            if not found:
+                log.info("   %-28s kein System erkannt", company["name"][:28])
+                continue
+            if found["adapter"] == company.get("adapter") and \
+               found["config"] == company.get("config"):
+                continue
+            log.info("   %-28s %s -> %s", company["name"][:28],
+                     company.get("adapter"), found["adapter"])
+            company["adapter"] = found["adapter"]
+            company["config"] = found["config"]
+            company["status"] = "repariert"
+            repaired += 1
+
+        if repaired:
+            COMPANIES_PATH.write_text(
+                yaml.safe_dump(companies_cfg, allow_unicode=True, sort_keys=False),
+                encoding="utf-8",
+            )
+            log.info("   %d Adapter neu zugeordnet - greifen ab dem naechsten Lauf", repaired)
+
+    # ---------------- Anreicherung ----------------
+
+    log.info("=== Anreicherung: Detailseiten der besten Treffer ===")
+    tried, improved = enrich(relevant, scorer,
+                             limit=int(scoring_cfg.get("enrich_limit", 40)))
+    log.info("Anreicherung: %d Seiten geladen, %d Treffer mit Laufzeit/Startdatum ergaenzt",
+             tried, improved)
+    relevant = [j for j in relevant if scorer.passes(j)]
 
     # ---------------- Stufe 2: Firmenregister ----------------
 

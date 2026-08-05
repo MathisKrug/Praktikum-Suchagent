@@ -26,7 +26,10 @@ functions:
     - merchandising
     - merchandise planning
     - e-commerce buying
-  20:
+  # Abgewertet nach dem ersten Lauf: "Business Development" hat einen
+  # Fussballverein, zwei IT-Beratungen und mehrere Startups eingeschleppt.
+  # Die Funktion bleibt drin, gewinnt aber nur noch mit Branchenbezug (siehe unten).
+  12:
     - corporate strategy
     - business development
     - founders associate
@@ -36,6 +39,34 @@ functions:
     - marketing
     - markenfuehrung
     - consumer
+
+# Branchenbezug. Taucht einer dieser Begriffe im Text auf, gibt es Zusatzpunkte.
+# So setzen sich Konsumgueter und Mode gegen artfremde Treffer durch,
+# ohne dass eine Stelle hart aussortiert wird.
+sector_signals:
+  points: 15
+  words:
+    - marke
+    - brand
+    - konsumgueter
+    - consumer goods
+    - fmcg
+    - handel
+    - retail
+    - einzelhandel
+    - mode
+    - fashion
+    - textil
+    - bekleidung
+    - beauty
+    - kosmetik
+    - lebensmittel
+    - food
+    - getraenke
+    - sortiment
+    - kollektion
+    - e-commerce
+    - onlineshop
 
 # Begriffe, die eine Stelle sofort disqualifizieren
 exclude:
@@ -98,5 +129,17 @@ duration:
 start_date_in_window_points: 25
 
 # Ab diesem Score taucht eine Stelle im Dashboard auf.
-# Tiefer setzen = mehr Rauschen, hoeher = du verpasst evtl. Randtreffer.
-min_score: 25
+#
+# Nach dem ersten echten Lauf von 25 auf 45 angehoben. Messwerte daraus:
+#   Ferrero Category Management Frankfurt ....... 78
+#   Otto Einkauf Hamburg ........................ 73
+#   Peek & Cloppenburg Brand Management ......... 73
+#   FC Viktoria Berlin Business Development ..... 40   <- Rauschen
+#   Devoteam IT-Beratung Business Development ... 40   <- Rauschen
+# 45 trennt sauber. Tiefer setzen = mehr Rauschen, hoeher = du verpasst Randtreffer.
+min_score: 45
+
+# Wie viele Detailseiten pro Lauf nachgeladen werden, um Laufzeit und
+# Startdatum zu ermitteln. Hoeher = genauer, aber laengere Laufzeit
+# (etwa 1,5 Sekunden pro Seite).
+enrich_limit: 40

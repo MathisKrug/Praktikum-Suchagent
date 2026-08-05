@@ -88,6 +88,9 @@ class Scorer:
         self.dur = cfg["duration"]
         self.start_points = cfg.get("start_date_in_window_points", 25)
         self.min_score = cfg.get("min_score", 25)
+        sec = cfg.get("sector_signals", {}) or {}
+        self.sector_points = int(sec.get("points", 0))
+        self.sector_words = [normalize(w) for w in sec.get("words", [])]
 
     def score(self, job: Job, strict: bool = False) -> Job:
         """strict=True verlangt einen Treffer bei den Zielfunktionen.
@@ -132,6 +135,13 @@ class Scorer:
             return job
 
         total += best_fn
+
+        # Branchenbezug
+        if self.sector_points:
+            hit = next((w for w in self.sector_words if w in body), None)
+            if hit:
+                total += self.sector_points
+                reasons.append(f"Branche '{hit}' (+{self.sector_points})")
 
         # Standort
         best_loc = 0
