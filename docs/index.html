@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Praktikum-Radar">
+<meta name="theme-color" content="#111418">
+<title>Praktikum-Radar</title>
+<style>
+  :root { --bg:#0f1115; --card:#181b21; --line:#262b33; --tx:#e8eaed;
+           --dim:#9aa2ad; --acc:#4da3ff; --new:#2ecc71; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--tx);
+          font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+          padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  header { padding:20px 16px 12px; position:sticky; top:0; background:var(--bg);
+            border-bottom:1px solid var(--line); z-index:10; }
+  h1 { margin:0 0 4px; font-size:20px; letter-spacing:-.3px; }
+  .meta { color:var(--dim); font-size:12px; }
+  .bar { display:flex; gap:6px; padding:12px 16px; overflow-x:auto;
+          border-bottom:1px solid var(--line); }
+  .bar button { background:var(--card); color:var(--tx); border:1px solid var(--line);
+                 border-radius:999px; padding:7px 13px; font-size:13px; white-space:nowrap; }
+  .bar button.on { background:var(--acc); border-color:var(--acc); color:#04121f; font-weight:600; }
+  main { padding:12px 16px 40px; }
+  .job { background:var(--card); border:1px solid var(--line); border-radius:12px;
+          padding:14px; margin-bottom:10px; display:block; color:inherit;
+          text-decoration:none; }
+  .job:active { border-color:var(--acc); }
+  .top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+  .co { font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.4px; }
+  .ti { font-weight:600; margin:3px 0 6px; }
+  .sc { background:#20252d; border-radius:8px; padding:3px 9px; font-size:13px;
+         font-weight:700; color:var(--acc); flex-shrink:0; }
+  .tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .tag { font-size:11px; color:var(--dim); background:#20252d; padding:3px 8px;
+          border-radius:6px; }
+  .badge { background:var(--new); color:#05210f; font-weight:700; }
+  .why { font-size:11px; color:var(--dim); margin-top:8px; line-height:1.5; }
+  .err { margin:14px 16px; font-size:12px; color:var(--dim); }
+  .err summary { cursor:pointer; }
+  .empty { color:var(--dim); text-align:center; padding:50px 20px; line-height:1.7; }
+  .tabs { display:flex; gap:8px; margin-top:12px; }
+  .tabs button { background:none; border:none; border-bottom:2px solid transparent;
+                  color:var(--dim); font-size:14px; padding:6px 2px; font-weight:600; }
+  .tabs button.on { color:var(--tx); border-bottom-color:var(--acc); }
+  .note { font-size:12px; color:var(--dim); margin-bottom:12px; line-height:1.6; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Praktikum-Radar</h1>
+  <div class="meta">6 Treffer &middot; 6 neu &middot;
+    4 Firmen entdeckt &middot; Stand 05.08.2026 00:20 UTC</div>
+  <div class="tabs">
+    <button data-v="jobs" class="on">Stellen</button>
+    <button data-v="firmen">Firmen (4)</button>
+  </div>
+</header>
+<div class="bar" id="filters">
+  <button data-f="all" class="on">Alle</button>
+  <button data-f="new">Neu</button>
+  <button data-f="fashion">Fashion</button>
+  <button data-f="fmcg">FMCG</button>
+  <button data-f="entdeckt">Entdeckt</button>
+  <button data-f="short">3&ndash;4 Monate</button>
+</div>
+<details class="err"><summary>1 Quelle(n) mit Problemen</summary><ul><li>adzuna: kein API-Key gesetzt</li></ul></details>
+<main id="list"></main>
+<script>
+const JOBS = [{"company": "Douglas", "sector": "entdeckt", "title": "Praktikum Category Management Beauty", "url": "https://a/1", "location": "Duesseldorf", "score": 105, "duration": 4.0, "start": "2027-01-01", "reasons": "Funktion 'category management' (+30); Standort 'duesseldorf' (+20); 4.0 Monate - passt ins Fenster (+30); Start 2027-01-01 im Fenster (+25)", "new": true, "first_seen": "2026-08-05"}, {"company": "Douglas", "sector": "entdeckt", "title": "Praktikum Brand Management", "url": "https://a/2", "location": "Duesseldorf", "score": 105, "duration": 3.0, "start": "2027-02-01", "reasons": "Funktion 'brand management' (+30); Standort 'duesseldorf' (+20); 3.0 Monate - passt ins Fenster (+30); Start 2027-02-01 im Fenster (+25)", "new": true, "first_seen": "2026-08-05"}, {"company": "Ludwig Beck AG", "sector": "entdeckt", "title": "Praktikum Einkauf Mode", "url": "https://a/3", "location": "Muenchen", "score": 100, "duration": 3.0, "start": "2027-01-01", "reasons": "Funktion 'einkauf' (+25); Standort 'muenchen' (+20); 3.0 Monate - passt ins Fenster (+30); Start 2027-01-01 im Fenster (+25)", "new": true, "first_seen": "2026-08-05"}, {"company": "Randstad Deutschland", "sector": "entdeckt", "title": "Praktikum Marketing", "url": "https://a/4", "location": "Frankfurt", "score": 90, "duration": 3.0, "start": "2027-01-01", "reasons": "Funktion 'marketing' (+10); Standort 'frankfurt' (+25); 3.0 Monate - passt ins Fenster (+30); Start 2027-01-01 im Fenster (+25)", "new": true, "first_seen": "2026-08-05"}, {"company": "Kleine Klitsche", "sector": "entdeckt", "title": "Praktikum Buchhaltung", "url": "https://a/6", "location": "Berlin", "score": 50, "duration": 3.0, "start": "", "reasons": "Standort 'berlin' (+20); 3.0 Monate - passt ins Fenster (+30)", "new": true, "first_seen": "2026-08-05"}, {"company": "Vaude Sport", "sector": "entdeckt", "title": "Praktikum Brand Marketing", "url": "https://a/5", "location": "Tettnang", "score": 30, "duration": 6.0, "start": "", "reasons": "Funktion 'brand marketing' (+30); 6.0 Monate - zu lang, nur mit Verhandlung (+0)", "new": true, "first_seen": "2026-08-05"}];
+const EMPLOYERS = [{"name": "Douglas", "hits": 2, "best": 105, "sample": "Praktikum Category Management Beauty", "watched": true, "adapter": "greenhouse"}, {"name": "Ludwig Beck AG", "hits": 1, "best": 100, "sample": "Praktikum Einkauf Mode", "watched": false, "adapter": ""}, {"name": "Kleine Klitsche", "hits": 1, "best": 50, "sample": "Praktikum Buchhaltung", "watched": false, "adapter": ""}, {"name": "Vaude Sport", "hits": 1, "best": 30, "sample": "Praktikum Brand Marketing", "watched": false, "adapter": ""}];
+const WATCHED = 1;
+const list = document.getElementById('list');
+const filters = document.getElementById('filters');
+let view = 'jobs', activeFilter = 'all';
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+}
+
+function render(filter) {
+  let rows = JOBS;
+  if (filter === 'new') rows = rows.filter(j => j.new);
+  else if (filter === 'short') rows = rows.filter(j => j.duration && j.duration <= 4.4);
+  else if (filter !== 'all') rows = rows.filter(j => j.sector === filter);
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty">Nichts gefunden.</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(j => {
+    const tags = [];
+    if (j.new) tags.push('<span class="tag badge">NEU</span>');
+    if (j.location) tags.push('<span class="tag">' + esc(j.location) + '</span>');
+    if (j.duration) tags.push('<span class="tag">' + j.duration + ' Mon.</span>');
+    if (j.start) tags.push('<span class="tag">ab ' + esc(j.start) + '</span>');
+    return '<a class="job" href="' + esc(j.url) + '" target="_blank" rel="noopener">'
+      + '<div class="top"><div><div class="co">' + esc(j.company) + '</div>'
+      + '<div class="ti">' + esc(j.title) + '</div></div>'
+      + '<div class="sc">' + j.score + '</div></div>'
+      + '<div class="tags">' + tags.join('') + '</div>'
+      + '<div class="why">' + esc(j.reasons) + '</div></a>';
+  }).join('');
+}
+
+function renderEmployers() {
+  if (!EMPLOYERS.length) {
+    list.innerHTML = '<div class="empty">Noch keine Firmen entdeckt.<br>'
+      + 'Stufe 1 braucht API-Keys &ndash; siehe README.</div>';
+    return;
+  }
+  list.innerHTML = '<div class="note">' + EMPLOYERS.length + ' Arbeitgeber haben '
+    + 'passende Praktika ausgeschrieben. ' + WATCHED + ' davon werden inzwischen '
+    + 'direkt auf ihrer Karriereseite &uuml;berwacht.</div>'
+    + EMPLOYERS.map(e => {
+    const tags = [];
+    if (e.watched) tags.push('<span class="tag badge">&Uuml;BERWACHT</span>');
+    tags.push('<span class="tag">' + e.hits + ' Treffer</span>');
+    if (e.adapter) tags.push('<span class="tag">' + esc(e.adapter) + '</span>');
+    return '<div class="job"><div class="top"><div>'
+      + '<div class="ti">' + esc(e.name) + '</div>'
+      + '<div class="co" style="text-transform:none">' + esc(e.sample) + '</div></div>'
+      + '<div class="sc">' + e.best + '</div></div>'
+      + '<div class="tags">' + tags.join('') + '</div></div>';
+  }).join('');
+}
+
+function draw() {
+  filters.style.display = (view === 'jobs') ? 'flex' : 'none';
+  if (view === 'jobs') render(activeFilter); else renderEmployers();
+}
+
+document.querySelectorAll('.bar button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.bar button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    activeFilter = b.dataset.f;
+    draw();
+  });
+});
+
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    view = b.dataset.v;
+    draw();
+  });
+});
+
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+# Fit-Scoring. Alles hier ist bewusst als Klartext gehalten,
+# damit du es ohne Python-Kenntnisse anpassen kannst.
+
+# Dein Verfuegbarkeitsfenster
+window:
+  start: "2027-01-01"
+  end: "2027-03-31"
+  # Praktika, die frueher enden als das hier, sind zu kurz um sinnvoll zu sein
+  min_months: 2
+
+# Zielfunktionen. Je hoeher das Gewicht, desto relevanter.
+# Treffer werden im Titel UND in der Beschreibung gesucht (Titel zaehlt doppelt).
+functions:
+  30:
+    - brand management
+    - brand manager
+    - product marketing
+    - category management
+    - trade marketing
+    - shopper marketing
+    - brand marketing
+  25:
+    - buying
+    - buyer
+    - einkauf
+    - merchandising
+    - merchandise planning
+    - e-commerce buying
+  20:
+    - corporate strategy
+    - business development
+    - founders associate
+    - commercial excellence
+    - strategy intern
+  10:
+    - marketing
+    - markenfuehrung
+    - consumer
+
+# Begriffe, die eine Stelle sofort disqualifizieren
+exclude:
+  - audit
+  - wirtschaftspruefung
+  - steuerberatung
+  - software engineer
+  - developer
+  - data engineer
+  - logistik
+  - lagerist
+  - verkaeufer
+  - sales associate
+  - retail store
+  - ausbildung
+  - werkstudent   # entferne diese Zeile, falls du auch Werkstudentenjobs sehen willst
+  - abschlussarbeit
+  - bachelorarbeit
+  - masterarbeit
+
+# Standorte. Reihenfolge = deine Praeferenz.
+locations:
+  25:
+    - frankfurt
+    - wien
+    - vienna
+  20:
+    - muenchen
+    - munich
+    - hamburg
+    - duesseldorf
+    - dusseldorf
+    - berlin
+  15:
+    - koeln
+    - cologne
+    - stuttgart
+    - zurich
+    - zuerich
+    - herzogenaurach
+    - metzingen
+  10:
+    - deutschland
+    - germany
+    - oesterreich
+    - austria
+    - schweiz
+    - switzerland
+
+# Laufzeit-Bewertung. Erkannt wird "3 Monate", "6 months", "3-6 Monate" usw.
+duration:
+  ideal: [3, 4]       # volle Punkte
+  ideal_points: 30
+  acceptable: [5]     # verhandelbar, leichte Abwertung
+  acceptable_points: 12
+  long_points: 0      # 6 Monate und mehr: keine Punkte, aber nicht aussortiert
+  unknown_points: 8   # keine Angabe gefunden -> Zweifel zugunsten der Stelle
+
+# Bonus, wenn ein Startdatum im Fenster erkannt wird
+start_date_in_window_points: 25
+
+# Ab diesem Score taucht eine Stelle im Dashboard auf.
+# Tiefer setzen = mehr Rauschen, hoeher = du verpasst evtl. Randtreffer.
+min_score: 25

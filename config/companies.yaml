@@ -1,0 +1,178 @@
+# Zielunternehmen.
+#
+# WICHTIG: Das Feld "adapter" ist bei den meisten Firmen eine VERMUTUNG,
+# welches Bewerbersystem sie einsetzen. Ich konnte das nicht vorab testen.
+# Fuehre einmal `python -m src.probe` aus - das Skript prueft jede Firma
+# und sagt dir, welche funktionieren und welche nachgebessert werden muessen.
+#
+# status: unverified | ok | broken   (wird von probe.py aktualisiert)
+
+companies:
+
+  # ---------- FASHION / RETAIL ----------
+
+  - key: zalando
+    name: Zalando
+    sector: fashion
+    adapter: zalando
+    status: unverified
+    config:
+      base: "https://jobs.zalando.com"
+
+  - key: hugoboss
+    name: HUGO BOSS
+    sector: fashion
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://careers.hugoboss.com"
+
+  - key: adidas
+    name: adidas
+    sector: fashion
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://careers.adidas-group.com"
+
+  - key: puma
+    name: PUMA
+    sector: fashion
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://about.puma.com/careers"
+
+  - key: breuninger
+    name: Breuninger
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.e-breuninger.de/de/karriere/stellenangebote/"
+      link_selector: "a[href*='/karriere/']"
+
+  - key: marcopolo
+    name: Marc O'Polo
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://company.marc-o-polo.com/de/karriere/start-creating-with-us/unsere-jobs"
+      link_selector: "a[href*='/unsere-jobs/']"
+
+  - key: tomtailor
+    name: Tom Tailor
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.tom-tailor-group.com/de/karriere/"
+      link_selector: "a[href*='job']"
+
+  # ---------- FMCG ----------
+
+  - key: beiersdorf
+    name: Beiersdorf
+    sector: fmcg
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://careers.beiersdorf.com"
+
+  - key: nestle
+    name: Nestle Deutschland
+    sector: fmcg
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://jobdetails.nestle.com"
+
+  - key: unilever
+    name: Unilever
+    sector: fmcg
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://careers.unilever.com"
+
+  - key: henkel
+    name: Henkel
+    sector: fmcg
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.henkel.de/karriere/finde-deinen-job-und-bewirb-dich"
+      link_selector: "a[href*='/karriere/']"
+
+  - key: mondelez
+    name: Mondelez International
+    sector: fmcg
+    adapter: workday
+    status: unverified
+    config:
+      tenant: "mondelezinternational"
+      datacenter: "wd3"
+      site: "External"
+
+  - key: mars
+    name: Mars
+    sector: fmcg
+    adapter: workday
+    status: unverified
+    config:
+      tenant: "mars"
+      datacenter: "wd3"
+      site: "External"
+
+  - key: loreal
+    name: L'Oreal
+    sector: fmcg
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://careers.loreal.com/de_DE/jobs/SearchJobs/"
+      link_selector: "a[href*='JobDetail']"
+
+  - key: redbull
+    name: Red Bull
+    sector: fmcg
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://jobs.redbull.com/at-de"
+      link_selector: "a[href*='/at-de/']"
+
+  - key: edeka
+    name: EDEKA Zentrale
+    sector: fmcg
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://verbund.edeka/karriere/stellenb%C3%B6rse/"
+      link_selector: "a[href*='stelle-']"
+
+  - key: eathappy
+    name: EAT HAPPY GROUP
+    sector: fmcg
+    adapter: teamtailor
+    status: unverified
+    config:
+      subdomain: "eathappygroup"
+
+  # ---------- BERATUNG (niedrig priorisiert, aber mitlaufen lassen) ----------
+
+  - key: occ
+    name: OC&C Strategy Consultants
+    sector: consulting
+    adapter: eploy
+    status: unverified
+    config:
+      url: "https://careers-de.occstrategy.com/vacancies/vacancy-search-results.aspx"
+
+# Suchbegriffe, die an die Systeme uebergeben werden, sofern sie Suche unterstuetzen.
+search_terms:
+  - "Praktikum"
+  - "Praktikant"
+  - "Intern"
+  - "Internship"

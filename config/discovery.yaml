@@ -1,0 +1,63 @@
+# Stufe 1: Breite Suche ueber Jobaggregatoren.
+# Findet Firmen, die weder du noch ich auf dem Schirm haben.
+
+enabled: true
+
+# Laender. Adzuna-Laendercodes.
+countries:
+  - de
+  - at
+
+# Suchbegriffe fuer die Aggregatoren.
+# Bewusst breit gehalten - der Scorer filtert danach scharf.
+queries:
+  - "Praktikum Brand Management"
+  - "Praktikum Marketing Marke"
+  - "Praktikum Product Marketing"
+  - "Praktikum Category Management"
+  - "Praktikum Trade Marketing"
+  - "Praktikum Einkauf Mode"
+  - "Praktikum Buying"
+  - "Praktikum Merchandising"
+  - "Praktikum E-Commerce"
+  - "Praktikum Business Development"
+  - "Praktikum Corporate Strategy"
+  - "Internship Brand Marketing"
+  - "Internship Buying Merchandising"
+  - "Praktikant Markenfuehrung"
+
+# Wie viele Seiten je Suchbegriff und Land abgefragt werden.
+# 2 Seiten x 50 Treffer x 14 Begriffe x 2 Laender = max. 2800 Rohtreffer pro Lauf.
+max_pages: 2
+results_per_page: 50
+
+# Stufe 3: Wann wird eine entdeckte Firma in die feste Ueberwachung uebernommen?
+promotion:
+  enabled: true
+  # Mindestens so viele relevante Treffer muss die Firma insgesamt geliefert haben
+  min_hits: 2
+  # ... und mindestens einmal diesen Score erreicht haben
+  min_best_score: 55
+  # Obergrenze, damit companies.yaml nicht explodiert und der Lauf nicht ewig dauert
+  max_promoted: 60
+
+# Arbeitgeber, die nie aufgenommen werden sollen.
+# Personaldienstleister und Vermittler produzieren viel Rauschen.
+employer_blocklist:
+  - "randstad"
+  - "adecco"
+  - "manpower"
+  - "hays"
+  - "univativ"
+  - "studitemps"
+  - "zenjob"
+  - "absolventa"
+  - "campusjaeger"
+  - "stellenanzeigen.de"
+  - "jobninja"
+  - "workwise"
+  - "instaffo"
+  - "gulp"
+  - "personal"
+  - "zeitarbeit"
+  - "recruiting"
