@@ -46,6 +46,10 @@ def main() -> int:
     scorer = Scorer(scoring_cfg)
     store = Store()
 
+    merged = store.dedupe_existing()
+    if merged:
+        log.info("Altbestand bereinigt: %d Dubletten zusammengefuehrt", merged)
+
     relevant = []
     errors: list[str] = []
     raw_total = 0

@@ -60,6 +60,54 @@ class Store:
         self.con.executescript(SCHEMA)
         self.con.commit()
 
+    def dedupe_existing(self) -> int:
+        """Fuehrt bereits gespeicherte Dubletten mit der neuen ID zusammen.
+
+        Noetig, weil die ID frueher an der URL hing. Adzuna und Jooble liefern
+        dieselbe Anzeige mit unterschiedlichen Weiterleitungen - dadurch stand
+        etwa Nestle fuenfmal in der Datenbank. Laeuft bei jedem Start und ist
+        danach wirkungslos, kostet also nichts.
+        """
+        rows = [dict(r) for r in self.con.execute("SELECT * FROM jobs").fetchall()]
+        groups: dict[str, list[dict]] = {}
+        for r in rows:
+            probe = Job(
+                company=r["company"] or "",
+                title=r["title"] or "",
+                url=r["url"] or "",
+                location=r["location"] or "",
+            )
+            groups.setdefault(probe.uid, []).append(r)
+
+        removed = 0
+        cur = self.con.cursor()
+        for new_uid, items in groups.items():
+            if len(items) == 1 and items[0]["uid"] == new_uid:
+                continue
+
+            # Den aussagekraeftigsten Eintrag behalten: hoechster Score,
+            # aber das aelteste first_seen, damit "neu" ehrlich bleibt.
+            keep = max(items, key=lambda x: (x["score"] or 0, x["last_seen"] or ""))
+            first_seen = min((x["first_seen"] or "9999") for x in items)
+            last_seen = max((x["last_seen"] or "") for x in items)
+
+            for x in items:
+                cur.execute("DELETE FROM jobs WHERE uid = ?", (x["uid"],))
+            removed += len(items) - 1
+
+            cur.execute(
+                """INSERT OR REPLACE INTO jobs
+                   (uid, company, sector, title, url, location, score, duration,
+                    start_date, reasons, first_seen, last_seen, status)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (new_uid, keep["company"], keep["sector"], keep["title"], keep["url"],
+                 keep["location"], keep["score"], keep["duration"], keep["start_date"],
+                 keep["reasons"], first_seen, last_seen, keep["status"] or "neu"),
+            )
+
+        self.con.commit()
+        return removed
+
     def upsert(self, jobs: list[Job]) -> list[Job]:
         """Speichert alle Jobs. Gibt die zurueck, die vorher unbekannt waren."""
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")

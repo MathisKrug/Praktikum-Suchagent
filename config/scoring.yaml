@@ -40,12 +40,45 @@ functions:
     - markenfuehrung
     - consumer
 
-# Branchenbezug. Taucht einer dieser Begriffe im Text auf, gibt es Zusatzpunkte.
-# So setzen sich Konsumgueter und Mode gegen artfremde Treffer durch,
-# ohne dass eine Stelle hart aussortiert wird.
+# Branchenbezug, gewichtet. Fashion und Luxury stehen bewusst hoeher als FMCG -
+# der erste Lauf war stark FMCG-lastig, weil die Aggregatoren dort mehr Volumen
+# haben. Diese Gewichtung zieht Mode wieder nach vorn, ohne FMCG auszuschliessen.
 sector_signals:
-  points: 15
-  words:
+  # Fashion / Luxury - Priorität
+  22:
+    - mode
+    - fashion
+    - luxury
+    - luxus
+    - maison
+    - couture
+    - ready-to-wear
+    - apparel
+    - textil
+    - bekleidung
+    - kollektion
+    - collection
+    - footwear
+    - schuhe
+    - accessoires
+    - leather goods
+    - lederwaren
+    - schmuck
+    - jewellery
+    - jewelry
+    - uhren
+    - watches
+    - visual merchandising
+  # Beauty und Duefte - Bindeglied zwischen Luxury und FMCG
+  16:
+    - beauty
+    - kosmetik
+    - cosmetics
+    - fragrance
+    - parfum
+    - skincare
+  # FMCG und Handel allgemein
+  11:
     - marke
     - brand
     - konsumgueter
@@ -54,17 +87,10 @@ sector_signals:
     - handel
     - retail
     - einzelhandel
-    - mode
-    - fashion
-    - textil
-    - bekleidung
-    - beauty
-    - kosmetik
     - lebensmittel
     - food
     - getraenke
     - sortiment
-    - kollektion
     - e-commerce
     - onlineshop
 
@@ -115,14 +141,31 @@ locations:
     - austria
     - schweiz
     - switzerland
+  # Modemetropolen. Bewusst niedrig gewichtet - DACH bleibt Priorität.
+  # Aber ohne diese Stufe würden LVMH, Richemont, OTB und Kering nie
+  # auftauchen, weil ihre Zentralen dort sitzen. Zeile löschen, wenn du
+  # nur im DACH-Raum suchen willst.
+  8:
+    - paris
+    - milano
+    - mailand
+    - milan
+    - london
+    - amsterdam
+    - genf
+    - geneva
+    - geneve
 
 # Laufzeit-Bewertung. Erkannt wird "3 Monate", "6 months", "3-6 Monate" usw.
 duration:
   ideal: [3, 4]       # volle Punkte
   ideal_points: 30
   acceptable: [5]     # verhandelbar, leichte Abwertung
-  acceptable_points: 12
-  long_points: 0      # 6 Monate und mehr: keine Punkte, aber nicht aussortiert
+  acceptable_points: 18
+  # 6 Monate und mehr: abgewertet, aber nicht mehr auf null. Bei starken
+  # Fashion-Häusern ist die Laufzeit oft Verhandlungssache, und eine
+  # 6-Monats-Stelle bei LVMH ist mehr wert als eine passgenaue irgendwo.
+  long_points: 12
   unknown_points: 8   # keine Angabe gefunden -> Zweifel zugunsten der Stelle
 
 # Bonus, wenn ein Startdatum im Fenster erkannt wird

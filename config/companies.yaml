@@ -70,6 +70,113 @@ companies:
       url: "https://www.tom-tailor-group.com/de/karriere/"
       link_selector: "a[href*='job']"
 
+  # ---------- LUXURY / FASHION HOUSES ----------
+  # Nachgetragen auf Wunsch: der erste Lauf war zu FMCG-lastig.
+  # Richemont ist verifiziert (Workday, wd3, Site "broadbean_external").
+  # Bei den uebrigen ist der Adapter eine Vermutung - die Selbstreparatur
+  # ordnet sie beim ersten Lauf neu zu, falls sie danebenliegt.
+
+  - key: richemont
+    name: Richemont
+    sector: fashion
+    adapter: workday
+    status: verified
+    config:
+      tenant: "richemont"
+      datacenter: "wd3"
+      site: "broadbean_external"
+
+  - key: otb
+    name: OTB Group
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://careers.otb.net/"
+      link_selector: "a[href*='job']"
+
+  - key: lvmh
+    name: LVMH
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.lvmh.com/en/join-us/our-job-offers"
+      link_selector: "a[href*='job']"
+
+  - key: kering
+    name: Kering
+    sector: fashion
+    adapter: workday
+    status: unverified
+    config:
+      tenant: "kering"
+      datacenter: "wd3"
+      site: "Kering"
+
+  - key: hermes
+    name: Hermes
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://talents.hermes.com/en/offers"
+      link_selector: "a[href*='offer']"
+
+  - key: pradagroup
+    name: Prada Group
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.pradagroup.com/en/careers/job-opportunities.html"
+      link_selector: "a[href*='job']"
+
+  - key: burberry
+    name: Burberry
+    sector: fashion
+    adapter: workday
+    status: unverified
+    config:
+      tenant: "burberry"
+      datacenter: "wd3"
+      site: "burberrycareers"
+
+  - key: moncler
+    name: Moncler
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.monclergroup.com/en/careers"
+      link_selector: "a[href*='career']"
+
+  - key: swarovski
+    name: Swarovski
+    sector: fashion
+    adapter: successfactors
+    status: unverified
+    config:
+      base: "https://careers.swarovski.com"
+
+  - key: aboutyou
+    name: ABOUT YOU
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://corporate.aboutyou.de/en/career/jobs"
+      link_selector: "a[href*='job']"
+
+  - key: peekcloppenburg
+    name: Peek & Cloppenburg
+    sector: fashion
+    adapter: generic_html
+    status: unverified
+    config:
+      url: "https://www.karriere-peek-cloppenburg.de/stellenangebote"
+      link_selector: "a[href*='stelle']"
+
   # ---------- FMCG ----------
 
   - key: beiersdorf

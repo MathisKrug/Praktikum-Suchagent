@@ -96,12 +96,39 @@ def _try_successfactors(slug: str):
     return None
 
 
+def _try_workday(slug: str):
+    """Viele Luxus- und Modekonzerne fahren Workday (Richemont, Kering, Burberry).
+
+    Der Tenant entspricht meist dem Firmen-Slug, das Rechenzentrum und der
+    Site-Name variieren - deshalb ein kleines Raster.
+    """
+    sites = ["External", "careers", "Careers", f"{slug}careers", "broadbean_external"]
+    for dc in ("wd3", "wd1", "wd5"):
+        host = f"https://{slug}.{dc}.myworkdayjobs.com"
+        for site in sites:
+            try:
+                r = requests.post(
+                    f"{host}/wday/cxs/{slug}/{site}/jobs",
+                    json={"appliedFacets": {}, "limit": 5, "offset": 0, "searchText": ""},
+                    headers={"Accept": "application/json", "User-Agent": UA},
+                    timeout=TIMEOUT,
+                )
+                time.sleep(0.4)
+                if r.status_code == 200 and r.json().get("jobPostings"):
+                    return {"adapter": "workday",
+                            "config": {"tenant": slug, "datacenter": dc, "site": site}}
+            except Exception:
+                continue
+    return None
+
+
 DETECTORS = [
     _try_greenhouse,
     _try_lever,
     _try_smartrecruiters,
     _try_teamtailor,
     _try_successfactors,
+    _try_workday,     # zuletzt: teuerste Pruefung, weil mehrere Kombinationen
 ]
 
 
