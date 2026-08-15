@@ -233,6 +233,13 @@ companies:
   status: auto
   config:
     base: https://careers.coty.com
+- key: serviceplan
+  name: SERVICEPLAN Gruppe
+  sector: entdeckt
+  adapter: teamtailor
+  status: auto
+  config:
+    subdomain: serviceplan
 search_terms:
 - Praktikum
 - Praktikant
