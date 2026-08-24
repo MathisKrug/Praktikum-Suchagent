@@ -240,6 +240,13 @@ companies:
   status: auto
   config:
     subdomain: serviceplan
+- key: doctolib
+  name: Doctolib
+  sector: entdeckt
+  adapter: greenhouse
+  status: auto
+  config:
+    board: doctolib
 search_terms:
 - Praktikum
 - Praktikant
