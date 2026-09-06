@@ -11,13 +11,13 @@ Läuft kostenlos auf GitHub Actions. Dein Rechner muss dafür nicht an sein.
 
 Das Werkzeug löst zwei verschiedene Probleme gleichzeitig.
 
-**Überwachung** — 18 fest konfigurierte Unternehmen aus Fashion und FMCG werden
-direkt auf ihrer Karriereseite abgefragt. Dort erscheinen Stellen zuerst, oft
-ein bis zwei Wochen bevor Jobbörsen sie einsammeln.
+**Überwachung** — die in `config/companies.yaml` konfigurierten Unternehmen aus
+Fashion und FMCG werden direkt auf ihrer Karriereseite abgefragt. Dort erscheinen
+Stellen zuerst, oft ein bis zwei Wochen bevor Jobbörsen sie einsammeln.
 
-**Entdeckung** — parallel läuft eine breite Suche über zwei Jobaggregatoren nach
-deinen Funktionsbegriffen, ohne Firmennamen vorzugeben. Das findet Arbeitgeber,
-die auf keiner Liste stehen, die du oder ich hätten aufschreiben können.
+**Entdeckung** — parallel läuft eine breite Suche über Adzuna nach deinen
+Funktionsbegriffen, ohne Firmennamen vorzugeben. Das findet Arbeitgeber, die auf
+keiner Liste stehen, die du oder ich hätten aufschreiben können.
 
 Aus der Entdeckung wächst über die Zeit ein **Firmenregister**: wer wie oft
 Praktika in deinem Profil ausschreibt und wie gut die im Schnitt passen. Nach
@@ -56,24 +56,22 @@ Unten auf **Commit changes**.
 
 ### 3. API-Keys hinterlegen
 
-Ohne diesen Schritt läuft nur die Überwachung der 18 Firmen — die Entdeckung
-bleibt still. Beide Dienste sind kostenlos.
+Ohne diesen Schritt läuft nur die Überwachung der festen Firmenliste — die
+Entdeckung bleibt still. Der Dienst ist kostenlos.
 
 **Adzuna:** auf [developer.adzuna.com](https://developer.adzuna.com) registrieren.
 Du bekommst eine **Application ID** und einen **Application Key**.
 
-**Jooble:** auf [jooble.org/api/about](https://jooble.org/api/about) das Formular
-ausfüllen (Name, Position, E-Mail, Website). Der Schlüssel wird sofort erzeugt.
-Als Website kannst du deine spätere Pages-Adresse angeben.
-
 Dann im Repo: **Settings → Secrets and variables → Actions → New repository secret**.
-Drei Stück anlegen, Namen exakt so:
+Zwei Stück anlegen, Namen exakt so:
 
 | Name | Wert |
 |---|---|
 | `ADZUNA_APP_ID` | deine Adzuna Application ID |
 | `ADZUNA_APP_KEY` | dein Adzuna Application Key |
-| `JOOBLE_API_KEY` | dein Jooble-Schlüssel |
+
+Falls du noch ein `JOOBLE_API_KEY`-Secret hast: kann weg. Jooble ist am
+18.08.2026 aus dem Projekt entfernt worden, siehe Abschnitt „Quellen".
 
 Secrets sind verschlüsselt und auch bei einem öffentlichen Repository für
 niemanden außer dich sichtbar. Schreib sie **nicht** in eine Datei im Repo.
@@ -119,16 +117,30 @@ Ab jetzt läuft der Scraper täglich um 06:00 UTC von selbst.
 ## Erster inhaltlicher Schritt: Probe-Lauf
 
 **Das hier ist wichtig.** Die Zuordnung „welche Firma nutzt welches Bewerbersystem"
-in `config/companies.yaml` ist zum Start eine begründete Vermutung, keine geprüfte
-Tatsache. Ich konnte das vorab nicht testen.
+in `config/companies.yaml` ist teils geprüfte Tatsache, teils begründete Vermutung.
+Jeder Eintrag sagt selbst, was er ist — im Feld `status`:
 
-Nach dem ersten Workflow-Lauf siehst du im Log, welche Firmen Treffer geliefert
-haben und welche mit einem Fehler ausgestiegen sind. Rechne damit, dass beim
-ersten Mal etwa ein Drittel nicht funktioniert.
+| `status` | Bedeutung |
+|---|---|
+| `geprueft-TT-MM-JJJJ` | am genannten Tag nachgewiesen, dass der Endpunkt Stellen liefert |
+| `kandidat-TT-MM-JJJJ` | starkes Indiz (URL-Muster des Systems), aber nicht abschließend geprüft |
+| `verified` | läuft nachweislich seit dem ersten Lauf |
+| `unverified` | Vermutung, noch nie bestätigt |
+| `stille-null` | antwortet ohne Fehler, liefert aber nichts — meist JavaScript-Seite |
+| `quelle-defekt` / `abgeschaltet` | bewusst inaktiv, Begründung steht im Feld `note` |
 
-Schick mir die Fehlerzeilen aus dem Log — ich suche dann das richtige System
-heraus und du tauschst eine Zeile in `companies.yaml`. Das ist bewusst so gebaut:
-lieber ein ehrlicher Fehler im Log als eine erfundene Stelle im Dashboard.
+**Den Probe-Lauf starten:** Tab **Actions** → links **Probe-Lauf** → **Run workflow**.
+
+Er geht jede Firma einzeln durch und schreibt `probe_report.md`. Neu ist:
+Wenn ein Adapter scheitert, sucht der Probe-Lauf **selbst** nach einer
+funktionierenden Alternative und legt einen fertigen YAML-Block in den Bericht.
+Du kopierst ihn über den alten Eintrag — fertig. Nichts davon ist geraten: im
+Bericht landet nur, was im Test tatsächlich Stellen zurückgegeben hat.
+
+Findet er nichts, steht das auch da. Das heißt dann meist: die Seite baut ihre
+Stellenliste erst im Browser auf, oder sie sperrt automatisierte Zugriffe.
+Beides ist kein Konfigurationsfehler und lässt sich durch Herumprobieren an
+`companies.yaml` nicht beheben.
 
 Lokal geht dasselbe schneller:
 
@@ -137,6 +149,40 @@ pip install -r requirements.txt
 python -m src.probe        # schreibt probe_report.md
 python -m src.scrape       # kompletter Lauf
 ```
+
+---
+
+## Quellenampel
+
+Dritter Reiter im Dashboard, **Quellen**. Jede Quelle mit Farbe:
+
+- **grün** — hat beim letzten Lauf Stellen geliefert
+- **gelb** — lief durch, lieferte aber nichts
+- **rot** — Fehler, oder seit sieben Läufen still
+
+Der eigentliche Grund für die Ampel ist Gelb. Ein Fehler im Log fällt auf. Eine
+Karriereseite, die brav mit HTTP 200 antwortet und trotzdem nie eine Stelle
+liefert, fällt nicht auf — sie sieht im Log aus wie Erfolg. Genau das war
+zwischen dem 5. und 17. August bei LVMH, Hermès, Kering und ABOUT YOU der Fall:
+kein einziger Fehler, kein einziger Treffer.
+
+## Nachweis auf jeder Karte
+
+Unten auf jeder Stellenkarte steht jetzt:
+
+```
+Quelle: Adzuna DE · ausgeschrieben: 2026-08-14 · erfasst: 2026-08-15
+```
+
+**Ausgeschrieben** ist das Datum der Quelle, **erfasst** der Tag, an dem der
+Scraper die Anzeige zum ersten Mal gesehen hat. Liefert eine Quelle kein
+Ausschreibungsdatum, steht dort `nicht auffindbar` — nie das Erfassungsdatum
+als Ersatz. Beide Felder stehen auch in der Excel-Datei.
+
+Für den Altbestand aus den ersten 16 Läufen wurde die Quelle nachgetragen,
+soweit sie sich aus der Weiterleitungs-URL ergibt (129 von 139 Stellen kamen
+über Adzuna). Das Ausschreibungsdatum ließ sich nicht nachtragen — es wurde
+damals nicht gespeichert. Diese Stellen bleiben ehrlich auf `nicht auffindbar`.
 
 ---
 
@@ -161,6 +207,18 @@ Wenn zu viel Rauschen kommt: auf 40 anheben.
 
 **`config/companies.yaml`** — die Zielliste. Neue Firma hinzufügen heißt:
 einen Block kopieren, `key`, `name` und `config` anpassen.
+
+Zusätzliche Felder je Firma:
+
+- `enabled: false` — Firma wird übersprungen, ohne sie zu löschen. Für Quellen,
+  die nachweislich defekt sind oder nicht in deinen Zielsektor gehören. Die
+  Begründung gehört ins Feld `note`, damit in drei Monaten noch nachvollziehbar
+  ist, warum.
+- `note:` — Freitext. Überlebt im Gegensatz zu YAML-Kommentaren, dass das Skript
+  die Datei bei der Selbstreparatur neu schreibt.
+- `hints:` — konkrete Kandidaten für die Systemerkennung, die zuerst geprüft
+  werden. Ein Hinweis wird nur übernommen, wenn er im Test tatsächlich Stellen
+  liefert.
 
 Zeitpunkt des täglichen Laufs: in `.github/workflows/scrape.yml`, Zeile mit `cron`.
 
@@ -187,10 +245,19 @@ Wenn dir eine Bewertung unplausibel vorkommt, siehst du sofort warum.
 
 ## Quellen — und was bewusst fehlt
 
-**Genutzt werden** die offiziellen Entwickler-APIs von
-[Adzuna](https://developer.adzuna.com) und [Jooble](https://jooble.org/api/about),
-beide kostenlos und beide mit Abdeckung für Deutschland und Österreich, sowie
-die Karriereseiten der konfigurierten Unternehmen direkt.
+**Genutzt wird** die offizielle Entwickler-API von
+[Adzuna](https://developer.adzuna.com) — kostenlos, mit Abdeckung für
+Deutschland und Österreich — sowie die Karriereseiten der konfigurierten
+Unternehmen direkt.
+
+**Jooble ist am 18.08.2026 ersatzlos entfernt worden.** Die API hat in 16
+aufeinanderfolgenden Läufen auf jede einzelne der 28 Anfragen pro Lauf mit
+`403 Forbidden` geantwortet — 448 Fehlschläge, null Ergebnisse. Ob der
+Schlüssel nie gültig war oder zurückgezogen wurde, ließ sich nicht klären.
+Eine Quelle, die ausschließlich Fehlerzeilen produziert, kostet Laufzeit und
+verdeckt echte Probleme im Log. Falls du Jooble später neu aufsetzt, lässt sich
+die Klasse aus der Versionsgeschichte zurückholen — die Struktur in
+`discovery.py` ist unverändert.
 
 **Nicht genutzt wird die Bundesagentur für Arbeit.** Sie hat die mit Abstand
 größte Stellendatenbank Deutschlands, und es existiert eine
@@ -226,13 +293,23 @@ schnell und die Server-Last niedrig, kostet aber Genauigkeit bei Laufzeit und
 Startdatum. Wenn dir das zu ungenau ist, bauen wir einen zweiten Durchgang ein,
 der für hoch bewertete Treffer die Detailseite nachlädt.
 
-**Die automatische Systemerkennung ist absichtlich vorsichtig.** Sie rät einen
-Firmen-Slug aus dem Namen und probiert die bekannten Muster durch. Bei
+**Die automatische Systemerkennung ist absichtlich vorsichtig.** Sie rät
+Firmen-Slugs aus dem Namen und probiert die bekannten Muster durch. Bei
 „Douglas Deutschland GmbH" wird daraus `douglas` — das trifft oft, aber nicht
 immer. Erkennt sie nichts, wird die Firma nicht aufgenommen und im Register
 ohne System-Eintrag geführt. Lieber kein Treffer als ein falscher, denn ein
 falsch erkanntes System würde fremde Stellen unter dem Namen der Firma
 einsortieren.
+
+Das Raster war anfangs zu eng: In 16 Läufen hat die Selbstreparatur keinen
+einzigen der zwölf defekten Adapter repariert. Zwei Beispiele, die zeigen warum —
+Swarovski fährt Workday unter dem Site-Namen `swarovski`, aber die Site-Liste
+kannte nur `External`, `careers`, `Careers`, `{slug}careers` und
+`broadbean_external`; der bloße Firmenname fehlte. adidas liegt auf
+`jobs.adidas-group.com`, geprüft wurden nur `careers.{slug}.com` und
+`jobs.{slug}.com`. Seit dem 18.08.2026 gibt es mehr Slug-Varianten, mehr
+Site-Namen, mehr Rechenzentren und das Feld `hints` für konkrete Vorgaben.
+Am Prinzip ändert sich nichts: übernommen wird nur, was antwortet.
 
 **Höflichkeit ist eingebaut:** 1,0 bis 1,5 Sekunden Pause zwischen Abrufen.
 Bitte nicht runtersetzen — sonst wirst du geblockt, und zwar zu Recht.
@@ -246,14 +323,16 @@ config/companies.yaml     fest ueberwachte Firmen (waechst automatisch)
 config/scoring.yaml       dein Filter
 config/discovery.yaml     breite Suche: Laender, Suchbegriffe, Blocklist
 src/adapters/             ein Adapter pro Bewerbersystem, nicht pro Firma
-src/discovery.py          Stufe 1 - Adzuna und Jooble
+src/discovery.py          Stufe 1 - Adzuna
 src/employers.py          Stufe 2 - Firmenregister
 src/detect.py             Stufe 3 - erkennt das Bewerbersystem einer Firma
 src/score.py              Bewertung
-src/store.py              SQLite, erkennt was neu ist
+src/store.py              SQLite, erkennt was neu ist, fuehrt die Quellenampel
 src/render.py             Dashboard + Excel
-src/probe.py              Diagnose der festen Firmenliste
+src/probe.py              Diagnose der festen Firmenliste, schlaegt Fixes vor
 src/scrape.py             Hauptlauf
+.github/workflows/scrape.yml   taeglicher Lauf, 06:00 UTC
+.github/workflows/probe.yml    Probe-Lauf auf Knopfdruck
 docs/                     wird von GitHub Pages ausgeliefert
 data/jobs.db              Zustand, wird vom Workflow committet
 ```

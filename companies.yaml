@@ -1,0 +1,308 @@
+companies:
+- key: zalando
+  name: Zalando
+  sector: fashion
+  adapter: generic_html
+  status: geprueft-18-08-2026
+  note: 'Trefferliste wird serverseitig ausgeliefert, Detail-URLs folgen dem Muster
+    /en/jobs/{id}-{slug}. Der frueher konfigurierte JSON-Endpunkt existiert nicht
+    mehr (404 in 16 Laeufen).'
+  config:
+    url: https://jobs.zalando.com/en/jobs
+    link_selector: a[href*='/en/jobs/']
+- key: hugoboss
+  name: HUGO BOSS
+  sector: fashion
+  adapter: successfactors
+  status: unverified
+  config:
+    base: https://careers.hugoboss.com
+  hints:
+  - adapter: successfactors
+    config:
+      base: https://jobs.hugoboss.com
+- key: adidas
+  name: adidas
+  sector: fashion
+  adapter: successfactors
+  status: geprueft-18-08-2026
+  note: 'Host korrigiert: careers.adidas-group.com liefert 404, jobs.adidas-group.com
+    ist die SuccessFactors-Instanz (242 Treffer fuer "intern" am 18.08.2026).'
+  config:
+    base: https://jobs.adidas-group.com
+- key: puma
+  name: PUMA
+  sector: fashion
+  adapter: generic_html
+  status: quelle-defekt
+  enabled: false
+  note: 'Abgeschaltet am 18.08.2026. Die Stellensuche auf about.puma.com liefert
+    serverseitig einen Drupal-Fehler (dd_job_search_get_locations_taxonomy_level)
+    und rendert keine Anzeigen. Das ist ein Defekt bei PUMA, nicht bei uns - erneut
+    versuchen, wenn die Seite wieder laeuft.'
+  config:
+    url: https://about.puma.com/en/careers/job-openings
+    link_selector: a[href*='/en/jobs/']
+- key: breuninger
+  name: Breuninger
+  sector: fashion
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://www.e-breuninger.de/de/karriere/stellenangebote/
+    link_selector: a[href*='/karriere/']
+- key: marcopolo
+  name: Marc O'Polo
+  sector: fashion
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://company.marc-o-polo.com/de/karriere/start-creating-with-us/unsere-jobs
+    link_selector: a[href*='/unsere-jobs/']
+- key: tomtailor
+  name: Tom Tailor
+  sector: fashion
+  adapter: generic_html
+  status: unverified
+  note: 'www.tom-tailor-group.com lief in 16 Laeufen in den Timeout. Die Stellen
+    der Gruppe erscheinen auch bei FashionUnited - das wird in Phase 1 als eigene
+    Quelle angebunden.'
+  config:
+    url: https://www.tom-tailor-group.com/de/karriere/
+    link_selector: a[href*='job']
+- key: richemont
+  name: Richemont
+  sector: fashion
+  adapter: workday
+  status: verified
+  config:
+    tenant: richemont
+    datacenter: wd3
+    site: broadbean_external
+- key: otb
+  name: OTB Group
+  sector: fashion
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://careers.otb.net/
+    link_selector: a[href*='job']
+- key: lvmh
+  name: LVMH
+  sector: fashion
+  adapter: generic_html
+  status: stille-null
+  note: 'Laeuft ohne Fehler und liefert trotzdem nichts: die Trefferliste wird im
+    Browser per JavaScript nachgeladen, der Adapter sieht nur das Menue. Steht in
+    Phase 1 auf der Liste fuer einen Headless-Browser oder den darunterliegenden
+    JSON-Endpunkt. Die Quellenampel zeigt das jetzt als still an.'
+  config:
+    url: https://www.lvmh.com/en/join-us/our-job-offers
+    link_selector: a[href*='job']
+- key: kering
+  name: Kering
+  sector: fashion
+  adapter: workday
+  status: unverified
+  config:
+    tenant: kering
+    datacenter: wd3
+    site: Kering
+- key: hermes
+  name: Hermes
+  sector: fashion
+  adapter: generic_html
+  status: stille-null
+  note: 'Wie LVMH: Stellenliste wird per JavaScript nachgeladen.'
+  config:
+    url: https://talents.hermes.com/en/offers
+    link_selector: a[href*='offer']
+- key: pradagroup
+  name: Prada Group
+  sector: fashion
+  adapter: successfactors
+  status: kandidat-18-08-2026
+  note: 'www.pradagroup.com/en/careers/job-opportunities.html liefert 404. Die
+    aktuelle Karriereseite ist jobs.pradagroup.com, und ihre Detail-URLs folgen
+    dem SuccessFactors-Muster /go/{Kategorie}/{id}/. Der Endpunkt selbst konnte
+    hier nicht geprueft werden - der Probe-Lauf entscheidet.'
+  config:
+    base: https://jobs.pradagroup.com
+  hints:
+  - adapter: successfactors
+    config:
+      base: https://jobs.pradagroup.com
+- key: burberry
+  name: Burberry
+  sector: fashion
+  adapter: workday
+  status: unverified
+  note: 'Workday antwortet mit 422 - Tenant stimmt vermutlich, der Site-Name nicht.
+    Das erweiterte Raster in detect.py probiert jetzt auch External_Career_Site,
+    Careers_External und den blossen Slug durch.'
+  config:
+    tenant: burberry
+    datacenter: wd3
+    site: burberrycareers
+- key: moncler
+  name: Moncler
+  sector: fashion
+  adapter: successfactors
+  status: kandidat-18-08-2026
+  note: 'monclergroup.com sperrt mit 403. jobs.moncler.com zeigt das
+    SuccessFactors-Muster /go/{Kategorie}/{id}/. Probe-Lauf entscheidet.'
+  config:
+    base: https://jobs.moncler.com
+  hints:
+  - adapter: successfactors
+    config:
+      base: https://jobs.moncler.com
+- key: swarovski
+  name: Swarovski
+  sector: fashion
+  adapter: workday
+  status: geprueft-18-08-2026
+  note: 'Grundlegend falsch zugeordnet: careers.swarovski.com existiert gar nicht
+    (DNS-Fehler in 16 Laeufen). Swarovski faehrt Workday unter
+    swarovski.wd3.myworkdayjobs.com/swarovski - der Site-Name ist schlicht der
+    Firmenname, genau der Fall, den das alte Erkennungsraster nicht kannte.'
+  config:
+    tenant: swarovski
+    datacenter: wd3
+    site: swarovski
+- key: aboutyou
+  name: ABOUT YOU
+  sector: fashion
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://corporate.aboutyou.de/en/career/jobs
+    link_selector: a[href*='job']
+- key: peekcloppenburg
+  name: Peek & Cloppenburg
+  sector: fashion
+  adapter: generic_html
+  status: kandidat-18-08-2026
+  note: 'Hostname war falsch geschrieben - karriere-peek-cloppenburg.de existiert
+    nicht, richtig ist karriere.peek-cloppenburg.de (Punkt statt Bindestrich).
+    Achtung: das eigentliche Stellenportal peek-cloppenburg.job-shop.com laedt
+    per JavaScript. P&C erreicht dich ohnehin ueber Adzuna - dort kam der bisher
+    hoechste Score des ganzen Projekts her (107).'
+  config:
+    url: https://karriere.peek-cloppenburg.de/dein-einstieg-bei-uns/praktika-nebenjobs
+    link_selector: a[href*='job']
+- key: beiersdorf
+  name: Beiersdorf
+  sector: fmcg
+  adapter: successfactors
+  status: unverified
+  config:
+    base: https://careers.beiersdorf.com
+- key: nestle
+  name: Nestle Deutschland
+  sector: fmcg
+  adapter: successfactors
+  status: unverified
+  config:
+    base: https://jobdetails.nestle.com
+- key: unilever
+  name: Unilever
+  sector: fmcg
+  adapter: successfactors
+  status: abgeschaltet
+  enabled: false
+  note: 'Abgeschaltet am 18.08.2026. Faellt seit 16 Laeufen mit 404 aus, und FMCG
+    ist nicht dein Zielsektor - Unilever erreicht dich bei Bedarf ueber Adzuna.
+    Aufwand fuer die Reparatur waere hier falsch investiert.'
+  config:
+    base: https://careers.unilever.com
+- key: henkel
+  name: Henkel
+  sector: fmcg
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://www.henkel.de/karriere/finde-deinen-job-und-bewirb-dich
+    link_selector: a[href*='/karriere/']
+- key: mondelez
+  name: Mondelez International
+  sector: fmcg
+  adapter: workday
+  status: abgeschaltet
+  enabled: false
+  note: 'Abgeschaltet am 18.08.2026, gleiche Begruendung wie Unilever: seit 16
+    Laeufen 422, und FMCG ist nicht dein Zielsektor.'
+  config:
+    tenant: mondelezinternational
+    datacenter: wd3
+    site: External
+- key: mars
+  name: Mars
+  sector: fmcg
+  adapter: workday
+  status: unverified
+  config:
+    tenant: mars
+    datacenter: wd3
+    site: External
+- key: loreal
+  name: L'Oreal
+  sector: fmcg
+  adapter: generic_html
+  status: unverified
+  note: 'careers.loreal.com sperrt mit 403 (Avature-Plattform mit Bot-Schutz).
+    Fuer Avature gibt es bislang keinen Adapter. Beauty ist dein Zielsektor,
+    deshalb bleibt die Firma drin - aber erwarte hier vorerst nichts. Die
+    L''Oreal-Praktika kamen bisher ueber Adzuna herein und tun das weiter.'
+  config:
+    url: https://careers.loreal.com/de_DE/jobs/SearchJobs/
+    link_selector: a[href*='JobDetail']
+- key: redbull
+  name: Red Bull
+  sector: fmcg
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://jobs.redbull.com/at-de
+    link_selector: a[href*='/at-de/']
+- key: edeka
+  name: EDEKA Zentrale
+  sector: fmcg
+  adapter: generic_html
+  status: unverified
+  config:
+    url: https://verbund.edeka/karriere/stellenb%C3%B6rse/
+    link_selector: a[href*='stelle-']
+- key: eathappy
+  name: EAT HAPPY GROUP
+  sector: fmcg
+  adapter: teamtailor
+  status: unverified
+  config:
+    subdomain: eathappygroup
+- key: occ
+  name: OC&C Strategy Consultants
+  sector: consulting
+  adapter: eploy
+  status: unverified
+  config:
+    url: https://careers-de.occstrategy.com/vacancies/vacancy-search-results.aspx
+- key: coty
+  name: Coty
+  sector: entdeckt
+  adapter: successfactors
+  status: auto
+  config:
+    base: https://careers.coty.com
+- key: serviceplan
+  name: SERVICEPLAN Gruppe
+  sector: entdeckt
+  adapter: teamtailor
+  status: auto
+  config:
+    subdomain: serviceplan
+search_terms:
+- Praktikum
+- Praktikant
+- Intern
+- Internship
