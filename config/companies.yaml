@@ -247,6 +247,22 @@ companies:
   status: auto
   config:
     board: doctolib
+- key: nrf
+  name: NRF
+  sector: entdeckt
+  adapter: workday
+  status: auto
+  config:
+    tenant: nrf
+    datacenter: wd3
+    site: External
+- key: aumovio
+  name: AUMOVIO
+  sector: entdeckt
+  adapter: smartrecruiters
+  status: auto
+  config:
+    company_id: aumovio
 search_terms:
 - Praktikum
 - Praktikant
