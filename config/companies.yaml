@@ -263,6 +263,22 @@ companies:
   status: auto
   config:
     company_id: aumovio
+- key: clarios
+  name: Clarios Germany GmbH & Co. KG
+  sector: entdeckt
+  adapter: workday
+  status: auto
+  config:
+    tenant: clarios
+    datacenter: wd5
+    site: clarioscareers
+- key: reckitt
+  name: Reckitt
+  sector: entdeckt
+  adapter: successfactors
+  status: auto
+  config:
+    base: https://careers.reckitt.com
 search_terms:
 - Praktikum
 - Praktikant
