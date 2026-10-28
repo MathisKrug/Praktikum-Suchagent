@@ -199,11 +199,10 @@ companies:
 - key: redbull
   name: Red Bull
   sector: fmcg
-  adapter: generic_html
-  status: unverified
+  adapter: smartrecruiters
+  status: repariert
   config:
-    url: https://jobs.redbull.com/at-de
-    link_selector: a[href*='/at-de/']
+    company_id: redbull
 - key: edeka
   name: EDEKA Zentrale
   sector: fmcg
